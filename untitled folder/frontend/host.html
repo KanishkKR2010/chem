@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>ChemBonding Host</title>
+
+<link rel="stylesheet" href="css/host.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>
+            Chem<span>Bonding</span>
+        </h1>
+
+        <h2>Host a Quiz</h2>
+
+        <input
+            id="title"
+            placeholder="Quiz title"
+        >
+
+        <select id="duration">
+
+            <option value="10">
+                10 seconds
+            </option>
+
+            <option value="20" selected>
+                20 seconds
+            </option>
+
+            <option value="30">
+                30 seconds
+            </option>
+
+            <option value="45">
+                45 seconds
+            </option>
+
+            <option value="60">
+                60 seconds
+            </option>
+
+        </select>
+
+        <button id="createBtn">
+            CREATE QUIZ
+        </button>
+
+        <p id="error"></p>
+
+    </div>
+
+
+    <div
+        id="created"
+        class="card hidden"
+    >
+
+        <p>GAME CODE</p>
+
+        <div id="gameCode">
+            ------
+        </div>
+
+        <button id="lobbyBtn">
+            OPEN LOBBY
+        </button>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script src="js/config.js"></script>
+
+<script src="js/host.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #164d32,
+            #06140d 65%
+        );
+
+    color: white;
+}
+
+.container {
+    width: min(500px, 92%);
+    margin: 70px auto;
+}
+
+.card {
+    background: #0d291d;
+
+    border:
+        1px solid #285a42;
+
+    border-radius: 22px;
+
+    padding: 35px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.35);
+}
+
+h1 {
+    font-size: 34px;
+}
+
+h1 span {
+    color: #55ff9a;
+}
+
+h2 {
+    margin-bottom: 25px;
+}
+
+input,
+select {
+    width: 100%;
+
+    padding: 15px;
+
+    margin-bottom: 15px;
+
+    background: #071b12;
+
+    color: white;
+
+    border:
+        1px solid #315c47;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: #55ff9a;
+
+    color: #052014;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+#gameCode {
+    font-size: 60px;
+
+    font-weight: 900;
+
+    letter-spacing: 8px;
+
+    color: #55ff9a;
+
+    margin: 20px;
+}
+
+#error {
+    color: #ff7180;
+}
+
+.hidden {
+    display: none;
+}

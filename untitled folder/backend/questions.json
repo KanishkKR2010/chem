@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "question": "Which type of bond is formed by transfer of electrons?",
+    "options": [
+      "Covalent bond",
+      "Ionic bond",
+      "Coordinate bond",
+      "Metallic bond"
+    ],
+    "answer": 1,
+    "points": 1000
+  },
+  {
+    "id": 2,
+    "question": "Which element has the highest electronegativity?",
+    "options": [
+      "Oxygen",
+      "Nitrogen",
+      "Fluorine",
+      "Chlorine"
+    ],
+    "answer": 2,
+    "points": 1000
+  },
+  {
+    "id": 3,
+    "question": "What is the shape of CH₄?",
+    "options": [
+      "Linear",
+      "Bent",
+      "Trigonal planar",
+      "Tetrahedral"
+    ],
+    "answer": 3,
+    "points": 1000
+  },
+  {
+    "id": 4,
+    "question": "What is the hybridisation of carbon in CH₄?",
+    "options": [
+      "sp",
+      "sp²",
+      "sp³",
+      "dsp²"
+    ],
+    "answer": 2,
+    "points": 1000
+  },
+  {
+    "id": 5,
+    "question": "How many valence electrons does oxygen have?",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": 2,
+    "points": 1000
+  },
+  {
+    "id": 6,
+    "question": "What is the approximate bond angle of H₂O?",
+    "options": [
+      "90°",
+      "104.5°",
+      "109.5°",
+      "120°"
+    ],
+    "answer": 1,
+    "points": 1000
+  },
+  {
+    "id": 7,
+    "question": "Which theory predicts molecular shape using electron-pair repulsion?",
+    "options": [
+      "VSEPR theory",
+      "Kinetic theory",
+      "Collision theory",
+      "Crystal field theory"
+    ],
+    "answer": 0,
+    "points": 1000
+  },
+  {
+    "id": 8,
+    "question": "A sigma bond is formed mainly by:",
+    "options": [
+      "Sidewise overlap",
+      "Head-on overlap",
+      "No overlap",
+      "Random overlap"
+    ],
+    "answer": 1,
+    "points": 1000
+  }
+]

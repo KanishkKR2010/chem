@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Quiz Lobby</title>
+
+<link rel="stylesheet" href="css/lobby.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+Chem<span>Bonding</span>
+</h1>
+
+<div class="code" id="code">
+------
+</div>
+
+<h2 id="title">
+Waiting for players...
+</h2>
+
+<p>
+Players joined:
+<span id="count">0</span>
+</p>
+
+<div id="players"></div>
+
+<button
+    id="startBtn"
+    class="hidden"
+>
+START QUIZ
+</button>
+
+</div>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script src="js/config.js"></script>
+
+<script src="js/lobby.js"></script>
+
+</body>
+
+</html>
