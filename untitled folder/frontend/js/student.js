@@ -1,93 +1,134 @@
-const socket =
-    io(https://chem-1-b9sa.onrender.com);
+// ============================================
+// ChemBonding - Student
+// ============================================
 
-const code =
-    document.getElementById("code");
+console.log("student.js loaded");
 
-const name =
-    document.getElementById("name");
+const socket = io(API_URL, {
+    transports: ["websocket", "polling"]
+});
 
-const joinBtn =
-    document.getElementById("joinBtn");
+const codeInput = document.getElementById("code");
+const nameInput = document.getElementById("name");
+const joinBtn = document.getElementById("joinBtn");
+const errorBox = document.getElementById("error");
 
-const error =
-    document.getElementById("error");
+socket.on("connect", () => {
+    console.log("Student connected:", socket.id);
+});
 
+socket.on("connect_error", (error) => {
+    console.error("Connection error:", error);
 
-joinBtn.onclick = () => {
+    errorBox.textContent =
+        "Unable to connect to quiz server.";
+});
 
-    const gameCode =
-        code.value.trim();
+joinBtn.addEventListener("click", joinGame);
 
-    const playerName =
-        name.value.trim();
+nameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        joinGame();
+    }
+});
 
-    if (!/^\d{6}$/.test(gameCode)) {
+codeInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        joinGame();
+    }
+});
 
-        error.textContent =
-            "Enter a 6-digit code.";
+function joinGame() {
+
+    errorBox.textContent = "";
+
+    const code =
+        codeInput.value.trim();
+
+    const name =
+        nameInput.value.trim();
+
+    if (!/^\d{6}$/.test(code)) {
+
+        errorBox.textContent =
+            "Enter the 6-digit game code.";
 
         return;
     }
 
-    if (!playerName) {
+    if (!name) {
 
-        error.textContent =
+        errorBox.textContent =
             "Enter your name.";
 
         return;
     }
 
-    joinBtn.disabled =
-        true;
+    if (name.length > 30) {
 
-    joinBtn.textContent =
-        "JOINING...";
+        errorBox.textContent =
+            "Name must be 30 characters or less.";
 
-    socket.emit(
-        "join-game",
-        {
-            code: gameCode,
-            name: playerName
-        }
+        return;
+    }
+
+    if (!socket.connected) {
+
+        errorBox.textContent =
+            "Quiz server is not connected.";
+
+        return;
+    }
+
+    joinBtn.disabled = true;
+    joinBtn.textContent = "JOINING...";
+
+    socket.emit("join-game", {
+        code: code,
+        name: name
+    });
+}
+
+
+// ============================================
+// Successfully joined
+// ============================================
+
+socket.on("joined-game", (data) => {
+
+    console.log("Joined:", data);
+
+    sessionStorage.setItem(
+        "quizCode",
+        data.code
     );
 
-};
+    sessionStorage.setItem(
+        "playerName",
+        data.name
+    );
+
+    sessionStorage.setItem(
+        "quizTitle",
+        data.title
+    );
+
+    window.location.href =
+        `lobby.html?code=${data.code}`;
+});
 
 
-socket.on(
-    "joined-game",
-    data => {
+// ============================================
+// Join error
+// ============================================
 
-        sessionStorage.setItem(
-            "quizCode",
-            data.code
-        );
+socket.on("join-error", (message) => {
 
-        sessionStorage.setItem(
-            "playerName",
-            data.name
-        );
+    console.error("Join error:", message);
 
-        window.location.href =
-            `lobby.html?code=${data.code}`;
+    errorBox.textContent = message;
 
-    }
-);
+    joinBtn.disabled = false;
 
-
-socket.on(
-    "join-error",
-    message => {
-
-        error.textContent =
-            message;
-
-        joinBtn.disabled =
-            false;
-
-        joinBtn.textContent =
-            "JOIN GAME";
-
-    }
-);
+    joinBtn.textContent = "JOIN GAME";
+});
