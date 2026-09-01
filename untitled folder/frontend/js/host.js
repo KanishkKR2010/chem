@@ -1,8 +1,18 @@
 console.log("host.js loaded");
 
+
+// ========================================
+// SOCKET CONNECTION
+// ========================================
+
 const socket = io(API_URL, {
     transports: ["websocket", "polling"]
 });
+
+
+// ========================================
+// HTML ELEMENTS
+// ========================================
 
 const titleInput = document.getElementById("title");
 const durationInput = document.getElementById("duration");
@@ -15,9 +25,9 @@ const lobbyBtn = document.getElementById("lobbyBtn");
 let code = null;
 
 
-// ================================
+// ========================================
 // SERVER CONNECTION
-// ================================
+// ========================================
 
 socket.on("connect", () => {
 
@@ -29,7 +39,9 @@ socket.on("connect", () => {
     error.textContent =
         "Connected to quiz server.";
 
-    error.style.color = "#55ff9a";
+    error.style.color =
+        "#55ff9a";
+
 });
 
 
@@ -43,22 +55,33 @@ socket.on("connect_error", (err) => {
     error.textContent =
         "Could not connect to quiz server.";
 
-    error.style.color = "#ff5c6c";
+    error.style.color =
+        "#ff5c6c";
 
-    createBtn.disabled = false;
-    createBtn.textContent = "CREATE QUIZ";
+    createBtn.disabled =
+        false;
+
+    createBtn.textContent =
+        "CREATE QUIZ";
+
 });
 
 
-// ================================
+// ========================================
 // CREATE QUIZ
-// ================================
+// ========================================
 
 createBtn.addEventListener("click", () => {
 
     console.log("CREATE QUIZ clicked");
 
+
+    // Clear previous message
+
     error.textContent = "";
+
+
+    // Get values
 
     const quizTitle =
         titleInput.value.trim();
@@ -66,6 +89,10 @@ createBtn.addEventListener("click", () => {
     const quizDuration =
         Number(durationInput.value);
 
+
+    // ====================================
+    // VALIDATE TITLE
+    // ====================================
 
     if (!quizTitle) {
 
@@ -81,6 +108,10 @@ createBtn.addEventListener("click", () => {
     }
 
 
+    // ====================================
+    // CHECK SERVER
+    // ====================================
+
     if (!socket.connected) {
 
         error.textContent =
@@ -89,11 +120,20 @@ createBtn.addEventListener("click", () => {
         error.style.color =
             "#ff5c6c";
 
+        console.error(
+            "Socket is not connected."
+        );
+
         return;
     }
 
 
-    createBtn.disabled = true;
+    // ====================================
+    // DISABLE BUTTON
+    // ====================================
+
+    createBtn.disabled =
+        true;
 
     createBtn.textContent =
         "CREATING...";
@@ -103,6 +143,10 @@ createBtn.addEventListener("click", () => {
         "Sending create-game request..."
     );
 
+
+    // ====================================
+    // SEND TO SERVER
+    // ====================================
 
     socket.emit(
         "create-game",
@@ -115,9 +159,9 @@ createBtn.addEventListener("click", () => {
 });
 
 
-// ================================
+// ========================================
 // GAME CREATED
-// ================================
+// ========================================
 
 socket.on("game-created", (game) => {
 
@@ -127,9 +171,38 @@ socket.on("game-created", (game) => {
     );
 
 
+    if (!game || !game.code) {
+
+        console.error(
+            "Invalid game data:",
+            game
+        );
+
+        error.textContent =
+            "Server returned invalid game data.";
+
+        error.style.color =
+            "#ff5c6c";
+
+        createBtn.disabled =
+            false;
+
+        createBtn.textContent =
+            "CREATE QUIZ";
+
+        return;
+    }
+
+
+    // Save game code
+
     code =
         game.code;
 
+
+    // ====================================
+    // SAVE HOST DATA
+    // ====================================
 
     localStorage.setItem(
         "hostCode",
@@ -137,17 +210,29 @@ socket.on("game-created", (game) => {
     );
 
 
-    localStorage.setItem(
-        "hostToken",
-        game.hostToken
-    );
+    if (game.hostToken) {
+
+        localStorage.setItem(
+            "hostToken",
+            game.hostToken
+        );
+
+    }
 
 
-    localStorage.setItem(
-        "quizTitle",
-        game.title
-    );
+    if (game.title) {
 
+        localStorage.setItem(
+            "quizTitle",
+            game.title
+        );
+
+    }
+
+
+    // ====================================
+    // DISPLAY GAME CODE
+    // ====================================
 
     gameCode.textContent =
         game.code;
@@ -158,13 +243,20 @@ socket.on("game-created", (game) => {
     );
 
 
+    // ====================================
+    // UPDATE BUTTON
+    // ====================================
+
     createBtn.disabled =
         false;
-
 
     createBtn.textContent =
         "QUIZ CREATED";
 
+
+    // ====================================
+    // SUCCESS MESSAGE
+    // ====================================
 
     error.textContent =
         "Quiz created successfully.";
@@ -181,9 +273,9 @@ socket.on("game-created", (game) => {
 });
 
 
-// ================================
+// ========================================
 // HOST ERROR
-// ================================
+// ========================================
 
 socket.on("host-error", (message) => {
 
@@ -194,8 +286,7 @@ socket.on("host-error", (message) => {
 
 
     error.textContent =
-        message;
-
+        message || "Unable to create quiz.";
 
     error.style.color =
         "#ff5c6c";
@@ -204,105 +295,36 @@ socket.on("host-error", (message) => {
     createBtn.disabled =
         false;
 
-
     createBtn.textContent =
         "CREATE QUIZ";
 
 });
 
 
-// ================================
+// ========================================
 // OPEN LOBBY
-// ================================
+// ========================================
 
 lobbyBtn.addEventListener("click", () => {
+
+    console.log(
+        "OPEN LOBBY clicked"
+    );
+
 
     if (!code) {
 
         error.textContent =
             "Game code is not available.";
 
+        error.style.color =
+            "#ff5c6c";
+
         return;
     }
 
 
     window.location.href =
-        `lobby.html?code=${code}&host=true`;
+        `lobby.html?code=${encodeURIComponent(code)}&host=true`;
 
 });
-        return;
-    }
-
-    createBtn.disabled = true;
-
-    createBtn.textContent =
-        "CREATING...";
-
-    socket.emit(
-        "create-game",
-        {
-            title:
-                title.value.trim(),
-
-            duration:
-                Number(duration.value)
-        }
-    );
-
-};
-
-
-socket.on(
-    "game-created",
-    game => {
-
-        code =
-            game.code;
-
-        localStorage.setItem(
-            "hostCode",
-            game.code
-        );
-
-        localStorage.setItem(
-            "hostToken",
-            game.hostToken
-        );
-
-        gameCode.textContent =
-            game.code;
-
-        created.classList.remove(
-            "hidden"
-        );
-
-        createBtn.textContent =
-            "QUIZ CREATED";
-
-    }
-);
-
-
-socket.on(
-    "host-error",
-    message => {
-
-        error.textContent =
-            message;
-
-        createBtn.disabled =
-            false;
-
-        createBtn.textContent =
-            "CREATE QUIZ";
-
-    }
-);
-
-
-lobbyBtn.onclick = () => {
-
-    window.location.href =
-        `lobby.html?code=${code}&host=true`;
-
-};
