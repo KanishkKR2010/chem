@@ -6,7 +6,7 @@ console.log("student.js loaded");
 
 
 // ============================================
-// SOCKET
+// SOCKET CONNECTION
 // ============================================
 
 const socket = io(API_URL, {
@@ -15,7 +15,7 @@ const socket = io(API_URL, {
 
 
 // ============================================
-// ELEMENTS
+// HTML ELEMENTS
 // ============================================
 
 const codeInput =
@@ -32,7 +32,28 @@ const errorBox =
 
 
 // ============================================
-// CONNECTION
+// PERSISTENT PLAYER ID
+// ============================================
+
+let playerId =
+    sessionStorage.getItem("playerId");
+
+
+if (!playerId) {
+
+    playerId =
+        crypto.randomUUID();
+
+    sessionStorage.setItem(
+        "playerId",
+        playerId
+    );
+
+}
+
+
+// ============================================
+// SOCKET CONNECTION
 // ============================================
 
 socket.on("connect", () => {
@@ -47,22 +68,33 @@ socket.on("connect", () => {
 });
 
 
-socket.on("connect_error", (error) => {
+// ============================================
+// CONNECTION ERROR
+// ============================================
 
-    console.error(
-        "Connection error:",
-        error
-    );
+socket.on(
+    "connect_error",
+    (error) => {
 
-    errorBox.textContent =
-        "Unable to connect to quiz server.";
+        console.error(
+            "Connection error:",
+            error
+        );
 
-    joinBtn.disabled = false;
+        errorBox.textContent =
+            "Unable to connect to quiz server.";
 
-    joinBtn.textContent =
-        "JOIN GAME";
+        errorBox.style.color =
+            "#ff5c6c";
 
-});
+        joinBtn.disabled =
+            false;
+
+        joinBtn.textContent =
+            "JOIN GAME";
+
+    }
+);
 
 
 // ============================================
@@ -84,7 +116,9 @@ nameInput.addEventListener(
     (event) => {
 
         if (event.key === "Enter") {
+
             joinGame();
+
         }
 
     }
@@ -96,7 +130,9 @@ codeInput.addEventListener(
     (event) => {
 
         if (event.key === "Enter") {
+
             joinGame();
+
         }
 
     }
@@ -119,17 +155,18 @@ function joinGame() {
 
 
     const name =
-        nameInput.value.trim();
+        nameInput.value
+            .trim();
 
 
     // ========================================
-    // VALIDATE CODE
+    // CODE VALIDATION
     // ========================================
 
-    if (!/^[A-Z0-9]{6}$/.test(code)) {
+    if (!/^\d{6}$/.test(code)) {
 
         errorBox.textContent =
-            "Enter the 6-character game code.";
+            "Enter the 6-digit game code.";
 
         errorBox.style.color =
             "#ff5c6c";
@@ -137,11 +174,12 @@ function joinGame() {
         codeInput.focus();
 
         return;
+
     }
 
 
     // ========================================
-    // VALIDATE NAME
+    // NAME VALIDATION
     // ========================================
 
     if (!name) {
@@ -155,6 +193,7 @@ function joinGame() {
         nameInput.focus();
 
         return;
+
     }
 
 
@@ -167,11 +206,12 @@ function joinGame() {
             "#ff5c6c";
 
         return;
+
     }
 
 
     // ========================================
-    // SERVER CONNECTION
+    // CONNECTION CHECK
     // ========================================
 
     if (!socket.connected) {
@@ -183,7 +223,28 @@ function joinGame() {
             "#ff5c6c";
 
         return;
+
     }
+
+
+    // ========================================
+    // SAVE STUDENT DATA
+    // ========================================
+
+    sessionStorage.setItem(
+        "playerId",
+        playerId
+    );
+
+    sessionStorage.setItem(
+        "playerName",
+        name
+    );
+
+    sessionStorage.setItem(
+        "quizCode",
+        code
+    );
 
 
     // ========================================
@@ -199,8 +260,12 @@ function joinGame() {
 
     console.log(
         "Joining game:",
-        code,
-        name
+        code
+    );
+
+    console.log(
+        "Player ID:",
+        playerId
     );
 
 
@@ -212,7 +277,8 @@ function joinGame() {
         "join-game",
         {
             code: code,
-            name: name
+            name: name,
+            playerId: playerId
         }
     );
 
@@ -233,40 +299,27 @@ socket.on(
         );
 
 
-        if (!data || !data.code) {
-
-            errorBox.textContent =
-                "Invalid response from server.";
-
-            joinBtn.disabled =
-                false;
-
-            joinBtn.textContent =
-                "JOIN GAME";
-
-            return;
-        }
-
-
-        // ====================================
-        // SAVE SESSION
-        // ====================================
+        // Save returned data
 
         sessionStorage.setItem(
-            "quizCode",
-            data.code
+            "playerId",
+            data.playerId || playerId
         );
-
 
         sessionStorage.setItem(
             "playerName",
             data.name
         );
 
+        sessionStorage.setItem(
+            "quizCode",
+            data.code
+        );
 
         sessionStorage.setItem(
             "quizTitle",
-            data.title || "ChemBonding Quiz"
+            data.title ||
+            "ChemBonding Quiz"
         );
 
 
@@ -305,7 +358,6 @@ socket.on(
 
         joinBtn.disabled =
             false;
-
 
         joinBtn.textContent =
             "JOIN GAME";
