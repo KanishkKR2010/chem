@@ -27,24 +27,31 @@ const PORT =
 
 
 // ============================================
-// QUESTIONS
+// LOAD QUESTIONS
 // ============================================
 
 const questions =
     JSON.parse(
-        fs.readFileSync("./questions.json", "utf8")
+        fs.readFileSync(
+            "./questions.json",
+            "utf8"
+        )
     );
+
+console.log(
+    `${questions.length} questions loaded`
+);
 
 
 // ============================================
-// GAMES
+// GAME STORAGE
 // ============================================
 
 const games = new Map();
 
 
 // ============================================
-// UTILITIES
+// GENERATE 6-DIGIT GAME CODE
 // ============================================
 
 function generateCode() {
@@ -59,11 +66,17 @@ function generateCode() {
                 Math.random() * 900000
             ).toString();
 
-    } while (games.has(code));
+    } while (
+        games.has(code)
+    );
 
     return code;
 }
 
+
+// ============================================
+// CLEAN NAME
+// ============================================
 
 function cleanName(name) {
 
@@ -73,6 +86,10 @@ function cleanName(name) {
         .slice(0, 30);
 }
 
+
+// ============================================
+// GET GAME
+// ============================================
 
 function getGame(code) {
 
@@ -84,17 +101,30 @@ function getGame(code) {
 
 
 // ============================================
-// PLAYERS
+// ROOM NAME
+// ============================================
+
+function room(game) {
+
+    return `game-${game.code}`;
+
+}
+
+
+// ============================================
+// GET PLAYERS
 // ============================================
 
 function getPlayers(game) {
 
-    return Object.entries(
+    return Object.values(
         game.players
-    ).map(
-        ([id, player]) => ({
+    ).map(player => {
 
-            id,
+        return {
+
+            playerId:
+                player.playerId,
 
             name:
                 player.name,
@@ -105,11 +135,16 @@ function getPlayers(game) {
             answered:
                 player.answered
 
-        })
-    );
+        };
+
+    });
 
 }
 
+
+// ============================================
+// LEADERBOARD
+// ============================================
 
 function getLeaderboard(game) {
 
@@ -118,6 +153,52 @@ function getLeaderboard(game) {
             (a, b) =>
                 b.score - a.score
         );
+
+}
+
+
+// ============================================
+// FIND PLAYER
+// ============================================
+
+function findPlayer(
+    game,
+    playerId
+) {
+
+    if (!playerId)
+        return null;
+
+    return Object.values(
+        game.players
+    ).find(
+        player =>
+            player.playerId ===
+            playerId
+    ) || null;
+
+}
+
+
+// ============================================
+// FIND PLAYER BY NAME
+// ============================================
+
+function findPlayerByName(
+    game,
+    name
+) {
+
+    if (!name)
+        return null;
+
+    return Object.values(
+        game.players
+    ).find(
+        player =>
+            player.name.toLowerCase() ===
+            name.toLowerCase()
+    ) || null;
 
 }
 
@@ -133,10 +214,8 @@ function publicQuestion(game) {
             game.questionIndex
         ];
 
-
     if (!q)
         return null;
-
 
     return {
 
@@ -170,18 +249,7 @@ function publicQuestion(game) {
 
 
 // ============================================
-// ROOM
-// ============================================
-
-function room(game) {
-
-    return `game-${game.code}`;
-
-}
-
-
-// ============================================
-// PLAYERS UPDATE
+// BROADCAST PLAYERS
 // ============================================
 
 function broadcastPlayers(game) {
@@ -197,7 +265,7 @@ function broadcastPlayers(game) {
 
 
 // ============================================
-// SEND CURRENT STATE TO SOCKET
+// SEND CURRENT STATE
 // ============================================
 
 function sendCurrentState(
@@ -205,9 +273,9 @@ function sendCurrentState(
     game
 ) {
 
-    // ------------------------------
-    // QUESTION
-    // ------------------------------
+    // ----------------------------
+    // CURRENT QUESTION
+    // ----------------------------
 
     if (
         game.status ===
@@ -216,7 +284,6 @@ function sendCurrentState(
 
         const question =
             publicQuestion(game);
-
 
         if (question) {
 
@@ -228,12 +295,13 @@ function sendCurrentState(
         }
 
         return;
+
     }
 
 
-    // ------------------------------
+    // ----------------------------
     // LEADERBOARD
-    // ------------------------------
+    // ----------------------------
 
     if (
         game.status ===
@@ -249,12 +317,13 @@ function sendCurrentState(
         );
 
         return;
+
     }
 
 
-    // ------------------------------
+    // ----------------------------
     // FINISHED
-    // ------------------------------
+    // ----------------------------
 
     if (
         game.status ===
@@ -288,6 +357,7 @@ function sendQuestion(game) {
         finishGame(game);
 
         return;
+
     }
 
 
@@ -301,15 +371,16 @@ function sendQuestion(game) {
 
     // Reset answers
 
-    for (
-        const player
-        of Object.values(game.players)
-    ) {
+    Object.values(
+        game.players
+    ).forEach(
+        player => {
 
-        player.answered =
-            false;
+            player.answered =
+                false;
 
-    }
+        }
+    );
 
 
     const question =
@@ -317,12 +388,11 @@ function sendQuestion(game) {
 
 
     console.log(
-        `Game ${game.code}: Question ${game.questionIndex + 1}`
+        `Game ${game.code}: Question ${game.questionIndex + 1}/${questions.length}`
     );
 
 
-    // IMPORTANT:
-    // Send to EVERYONE
+    // Send question to everyone
 
     io.to(
         room(game)
@@ -338,7 +408,9 @@ function sendQuestion(game) {
         () => {
 
             const current =
-                getGame(game.code);
+                getGame(
+                    game.code
+                );
 
 
             if (!current)
@@ -362,7 +434,9 @@ function sendQuestion(game) {
                 return;
 
 
-            endQuestion(current);
+            endQuestion(
+                current
+            );
 
         },
         game.duration * 1000
@@ -412,12 +486,19 @@ function endQuestion(game) {
 
 function finishGame(game) {
 
+    if (
+        game.status ===
+        "finished"
+    )
+        return;
+
+
     game.status =
         "finished";
 
 
     console.log(
-        `Game ${game.code}: FINISHED`
+        `Game ${game.code}: Finished`
     );
 
 
@@ -435,7 +516,7 @@ function finishGame(game) {
 
 
 // ============================================
-// HTTP
+// HTTP ROUTES
 // ============================================
 
 app.get(
@@ -443,9 +524,16 @@ app.get(
     (req, res) => {
 
         res.json({
-            status: "online",
+
+            status:
+                "online",
+
             service:
-                "ChemBonding Quiz Server"
+                "ChemBonding Quiz Server",
+
+            questions:
+                questions.length
+
         });
 
     }
@@ -478,9 +566,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // CREATE GAME
-        // ====================================
+        // ========================================
 
         socket.on(
             "create-game",
@@ -488,7 +576,7 @@ io.on(
 
                 const title =
                     cleanName(
-                        data.title
+                        data?.title
                     ) ||
                     "Chemical Bonding Quiz";
 
@@ -498,7 +586,7 @@ io.on(
                         5,
                         Math.min(
                             Number(
-                                data.duration
+                                data?.duration
                             ) || 20,
                             120
                         )
@@ -568,9 +656,13 @@ io.on(
                 socket.emit(
                     "game-created",
                     {
+
                         code,
+
                         title,
+
                         hostToken
+
                     }
                 );
 
@@ -588,9 +680,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // HOST RECONNECT
-        // ====================================
+        // ========================================
 
         socket.on(
             "host-reconnect",
@@ -598,7 +690,7 @@ io.on(
 
                 const game =
                     getGame(
-                        data.code
+                        data?.code
                     );
 
 
@@ -610,11 +702,12 @@ io.on(
                     );
 
                     return;
+
                 }
 
 
                 if (
-                    data.hostToken !==
+                    data?.hostToken !==
                     game.hostToken
                 ) {
 
@@ -624,10 +717,11 @@ io.on(
                     );
 
                     return;
+
                 }
 
 
-                // Replace old host socket
+                // New host socket
 
                 game.hostSocket =
                     socket.id;
@@ -651,22 +745,23 @@ io.on(
                 socket.emit(
                     "host-reconnected",
                     {
+
                         code:
                             game.code,
 
                         title:
                             game.title
+
                     }
                 );
 
 
                 console.log(
-                    `Host reconnected to ${game.code}`
+                    `Host reconnected: ${game.code}`
                 );
 
 
-                // IMPORTANT:
-                // Restore current game state
+                // Restore current state
 
                 sendCurrentState(
                     socket,
@@ -682,9 +777,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // JOIN GAME
-        // ====================================
+        // ========================================
 
         socket.on(
             "join-game",
@@ -692,17 +787,27 @@ io.on(
 
                 const code =
                     String(
-                        data.code || ""
+                        data?.code || ""
                     )
-                        .trim()
-                        .toUpperCase();
+                        .trim();
 
 
                 const name =
                     cleanName(
-                        data.name
+                        data?.name
                     );
 
+
+                const playerId =
+                    String(
+                        data?.playerId || ""
+                    )
+                        .trim();
+
+
+                // ----------------------------
+                // Validate code
+                // ----------------------------
 
                 if (
                     !/^\d{6}$/.test(
@@ -716,8 +821,13 @@ io.on(
                     );
 
                     return;
+
                 }
 
+
+                // ----------------------------
+                // Validate name
+                // ----------------------------
 
                 if (!name) {
 
@@ -727,6 +837,23 @@ io.on(
                     );
 
                     return;
+
+                }
+
+
+                // ----------------------------
+                // Validate player ID
+                // ----------------------------
+
+                if (!playerId) {
+
+                    socket.emit(
+                        "join-error",
+                        "Student session is invalid. Please join again."
+                    );
+
+                    return;
+
                 }
 
 
@@ -742,11 +869,12 @@ io.on(
                     );
 
                     return;
+
                 }
 
 
                 // ====================================
-                // GAME STILL IN LOBBY
+                // LOBBY
                 // ====================================
 
                 if (
@@ -754,18 +882,110 @@ io.on(
                     "lobby"
                 ) {
 
-                    const duplicate =
-                        Object.values(
-                            game.players
-                        ).some(
-                            p =>
-                                p.name
-                                    .toLowerCase() ===
-                                name.toLowerCase()
+                    // Check whether this
+                    // student already exists
+
+                    let existingPlayer =
+                        findPlayer(
+                            game,
+                            playerId
                         );
 
 
-                    if (duplicate) {
+                    // ----------------------------
+                    // Existing player
+                    // ----------------------------
+
+                    if (
+                        existingPlayer
+                    ) {
+
+                        existingPlayer.socketId =
+                            socket.id;
+
+
+                        socket.gameCode =
+                            code;
+
+                        socket.isHost =
+                            false;
+
+                        socket.playerId =
+                            playerId;
+
+
+                        socket.join(
+                            room(game)
+                        );
+
+
+                        socket.emit(
+                            "joined-game",
+                            {
+
+                                code,
+
+                                name:
+                                    existingPlayer.name,
+
+                                title:
+                                    game.title,
+
+                                playerId
+
+                            }
+                        );
+
+
+                        broadcastPlayers(
+                            game
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    // ----------------------------
+                    // Check duplicate player ID
+                    // ----------------------------
+
+                    const duplicateId =
+                        findPlayer(
+                            game,
+                            playerId
+                        );
+
+
+                    if (
+                        duplicateId
+                    ) {
+
+                        socket.emit(
+                            "join-error",
+                            "You are already in this quiz."
+                        );
+
+                        return;
+
+                    }
+
+
+                    // ----------------------------
+                    // Check duplicate name
+                    // ----------------------------
+
+                    const duplicateName =
+                        findPlayerByName(
+                            game,
+                            name
+                        );
+
+
+                    if (
+                        duplicateName
+                    ) {
 
                         socket.emit(
                             "join-error",
@@ -773,18 +993,30 @@ io.on(
                         );
 
                         return;
+
                     }
 
 
+                    // ----------------------------
+                    // Create player
+                    // ----------------------------
+
                     game.players[
-                        socket.id
+                        playerId
                     ] = {
+
+                        playerId,
+
+                        socketId:
+                            socket.id,
 
                         name,
 
-                        score: 0,
+                        score:
+                            0,
 
-                        answered: false
+                        answered:
+                            false
 
                     };
 
@@ -795,6 +1027,9 @@ io.on(
                     socket.isHost =
                         false;
 
+                    socket.playerId =
+                        playerId;
+
 
                     socket.join(
                         room(game)
@@ -804,10 +1039,16 @@ io.on(
                     socket.emit(
                         "joined-game",
                         {
+
                             code,
+
                             name,
+
                             title:
-                                game.title
+                                game.title,
+
+                            playerId
+
                         }
                     );
 
@@ -823,15 +1064,12 @@ io.on(
 
 
                     return;
+
                 }
 
 
                 // ====================================
-                // GAME ALREADY STARTED
-                //
-                // This is the important fix.
-                // The student is coming from lobby
-                // to quiz.html with a NEW socket.
+                // QUESTION / LEADERBOARD
                 // ====================================
 
                 if (
@@ -841,75 +1079,50 @@ io.on(
                     "leaderboard"
                 ) {
 
-                    let existingId =
-                        null;
+                    let player =
+                        findPlayer(
+                            game,
+                            playerId
+                        );
 
 
-                    for (
-                        const [
-                            playerId,
-                            player
-                        ]
-                        of Object.entries(
-                            game.players
-                        )
-                    ) {
+                    // ----------------------------
+                    // Player ID not found
+                    // ----------------------------
 
-                        if (
-                            player.name
-                                .toLowerCase() ===
-                            name.toLowerCase()
-                        ) {
+                    if (!player) {
 
-                            existingId =
-                                playerId;
+                        // Fallback by name.
+                        // This helps older sessions
+                        // created before playerId.
 
-                            break;
-                        }
+                        player =
+                            findPlayerByName(
+                                game,
+                                name
+                            );
 
                     }
 
 
-                    // Student must already
-                    // be part of the game
-
-                    if (!existingId) {
+                    if (!player) {
 
                         socket.emit(
                             "join-error",
-                            "You were not in this quiz."
+                            "You were not part of this quiz."
                         );
 
                         return;
-                    }
-
-
-                    const player =
-                        game.players[
-                            existingId
-                        ];
-
-
-                    // Remove old socket mapping
-
-                    if (
-                        existingId !==
-                        socket.id
-                    ) {
-
-                        delete game.players[
-                            existingId
-                        ];
 
                     }
 
 
-                    // Attach player to
-                    // new socket
+                    // ----------------------------
+                    // Update socket
+                    // ----------------------------
 
-                    game.players[
-                        socket.id
-                    ] = player;
+                    player.socketId =
+                        socket.id;
 
 
                     socket.gameCode =
@@ -917,6 +1130,9 @@ io.on(
 
                     socket.isHost =
                         false;
+
+                    socket.playerId =
+                        player.playerId;
 
 
                     socket.join(
@@ -927,23 +1143,29 @@ io.on(
                     socket.emit(
                         "joined-game",
                         {
+
                             code,
+
                             name:
                                 player.name,
+
                             title:
-                                game.title
+                                game.title,
+
+                            playerId:
+                                player.playerId
+
                         }
                     );
 
 
                     console.log(
-                        `${name} reconnected to ${code}`
+                        `${player.name} reconnected to ${code}`
                     );
 
 
-                    // IMPORTANT:
-                    // Give student the current
-                    // question/leaderboard
+                    // Send current question
+                    // or leaderboard
 
                     sendCurrentState(
                         socket,
@@ -957,6 +1179,7 @@ io.on(
 
 
                     return;
+
                 }
 
 
@@ -975,15 +1198,16 @@ io.on(
                     );
 
                     return;
+
                 }
 
             }
         );
 
 
-        // ====================================
+        // ========================================
         // START GAME
-        // ====================================
+        // ========================================
 
         socket.on(
             "start-game",
@@ -1025,11 +1249,11 @@ io.on(
                     );
 
                     return;
+
                 }
 
 
-                // IMPORTANT:
-                // Start at Question 1
+                // Question 1
 
                 game.questionIndex =
                     0;
@@ -1043,9 +1267,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // SUBMIT ANSWER
-        // ====================================
+        // ========================================
 
         socket.on(
             "submit-answer",
@@ -1070,7 +1294,7 @@ io.on(
 
                 const player =
                     game.players[
-                        socket.id
+                        socket.playerId
                     ];
 
 
@@ -1086,7 +1310,7 @@ io.on(
 
                 const answer =
                     Number(
-                        data.answer
+                        data?.answer
                     );
 
 
@@ -1112,7 +1336,8 @@ io.on(
                 const remaining =
                     Math.max(
                         0,
-                        game.duration * 1000 -
+                        game.duration *
+                        1000 -
                         elapsed
                     );
 
@@ -1120,6 +1345,8 @@ io.on(
                 let points =
                     0;
 
+
+                // Correct
 
                 if (
                     answer ===
@@ -1157,6 +1384,7 @@ io.on(
                     socket.emit(
                         "answer-result",
                         {
+
                             correct:
                                 true,
 
@@ -1164,14 +1392,20 @@ io.on(
 
                             score:
                                 player.score
+
                         }
                     );
 
-                } else {
+                }
+
+                // Incorrect
+
+                else {
 
                     socket.emit(
                         "answer-result",
                         {
+
                             correct:
                                 false,
 
@@ -1180,16 +1414,22 @@ io.on(
 
                             score:
                                 player.score
+
                         }
                     );
 
                 }
 
 
+                // Lock answer
+
                 socket.emit(
                     "answer-locked"
                 );
 
+
+                // Send answer progress
+                // to host
 
                 io.to(
                     game.hostSocket
@@ -1202,8 +1442,8 @@ io.on(
                                 game.players
                             )
                                 .filter(
-                                    p =>
-                                        p.answered
+                                    player =>
+                                        player.answered
                                 )
                                 .length,
 
@@ -1219,9 +1459,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // END QUESTION
-        // ====================================
+        // ========================================
 
         socket.on(
             "end-question",
@@ -1252,9 +1492,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // NEXT QUESTION
-        // ====================================
+        // ========================================
 
         socket.on(
             "next-question",
@@ -1297,6 +1537,7 @@ io.on(
                     );
 
                     return;
+
                 }
 
 
@@ -1308,9 +1549,9 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // END GAME
-        // ====================================
+        // ========================================
 
         socket.on(
             "end-game",
@@ -1341,13 +1582,19 @@ io.on(
         );
 
 
-        // ====================================
+        // ========================================
         // DISCONNECT
-        // ====================================
+        // ========================================
 
         socket.on(
             "disconnect",
             () => {
+
+                console.log(
+                    "Disconnected:",
+                    socket.id
+                );
+
 
                 const code =
                     socket.gameCode;
@@ -1361,9 +1608,9 @@ io.on(
                     return;
 
 
-                // ----------------------------
-                // HOST
-                // ----------------------------
+                // ==================================
+                // HOST DISCONNECT
+                // ==================================
 
                 if (
                     socket.id ===
@@ -1379,12 +1626,17 @@ io.on(
                         () => {
 
                             const current =
-                                getGame(code);
+                                getGame(
+                                    code
+                                );
 
 
                             if (!current)
                                 return;
 
+
+                            // Host has not
+                            // reconnected
 
                             if (
                                 current.hostSocket ===
@@ -1415,34 +1667,58 @@ io.on(
 
 
                     return;
+
                 }
 
 
-                // ----------------------------
-                // STUDENT
-                // ----------------------------
+                // ==================================
+                // STUDENT DISCONNECT
+                // ==================================
 
-                /*
-                 * If the player has already
-                 * reconnected with a new socket,
-                 * don't delete the new player.
-                 */
-
-                if (
+                const player =
                     game.players[
-                        socket.id
-                    ]
-                ) {
-
-                    delete game.players[
-                        socket.id
+                        socket.playerId
                     ];
 
-                    broadcastPlayers(
-                        game
-                    );
+
+                if (!player)
+                    return;
+
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Do NOT delete the player.
+                 *
+                 * The student may simply be
+                 * moving from lobby.html to
+                 * quiz.html, which creates a
+                 * new Socket.IO connection.
+                 *
+                 * We keep the player in the game.
+                 */
+
+                console.log(
+                    `Student disconnected: ${player.name}`
+                );
+
+
+                // Only clear socket reference
+
+                if (
+                    player.socketId ===
+                    socket.id
+                ) {
+
+                    player.socketId =
+                        null;
 
                 }
+
+
+                broadcastPlayers(
+                    game
+                );
 
             }
 
@@ -1461,11 +1737,23 @@ server.listen(
     () => {
 
         console.log(
-            `ChemBonding server running on port ${PORT}`
+            "===================================="
         );
 
         console.log(
-            `${questions.length} questions loaded`
+            "ChemBonding Quiz Server"
+        );
+
+        console.log(
+            `Running on port ${PORT}`
+        );
+
+        console.log(
+            `${questions.length} questions available`
+        );
+
+        console.log(
+            "===================================="
         );
 
     }
