@@ -1,5 +1,5 @@
 const socket =
-    io(API_URL);
+    io(https://chem-1-b9sa.onrender.com);
 
 const params =
     new URLSearchParams(
