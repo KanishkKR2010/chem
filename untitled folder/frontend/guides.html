@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemBonding | Guides</title>
+    <link rel="stylesheet" href="guides.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">Chem<span>Bonding</span></div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="periodic.html">Periodic Table</a>
+        <a class="active" href="guides.html">Guides</a>
+        <a href="molecules.html">Molecules</a>
+    </nav>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div>
+            <p class="tag">CHEMICAL BONDING ACADEMY</p>
+            <h1>Learn Chemical Bonding<br><span>Step by Step</span></h1>
+
+            <p class="hero-text">
+                Understand concepts, visualize bonding, learn shortcuts
+                and test yourself with interactive quizzes.
+            </p>
+
+            <button onclick="scrollToGuides()">Start Learning</button>
+        </div>
+
+        <div class="atom">
+            <div class="orbit orbit1"></div>
+            <div class="orbit orbit2"></div>
+            <div class="nucleus">C</div>
+            <div class="electron e1"></div>
+            <div class="electron e2"></div>
+            <div class="electron e3"></div>
+            <div class="electron e4"></div>
+        </div>
+    </section>
+
+
+    <section class="progress-section">
+        <div>
+            <h2>Your Learning Progress</h2>
+            <p id="progressText">0% completed</p>
+        </div>
+
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+    </section>
+
+
+    <section id="guides" class="guides-section">
+
+        <div class="section-title">
+            <p class="tag">CONCEPT LIBRARY</p>
+            <h2>Choose a Topic</h2>
+            <p>Learn the concept first, then test your understanding.</p>
+        </div>
+
+        <div class="guide-grid">
+
+            <div class="guide-card" onclick="openGuide('octet')">
+                <div class="icon">⚛</div>
+                <h3>Octet Rule</h3>
+                <p>Understand why atoms gain, lose or share electrons.</p>
+                <span>Beginner →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('ionic')">
+                <div class="icon">+</div>
+                <h3>Ionic Bonding</h3>
+                <p>Learn electron transfer, ions and lattice formation.</p>
+                <span>Beginner →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('covalent')">
+                <div class="icon">↔</div>
+                <h3>Covalent Bonding</h3>
+                <p>Learn how atoms share electron pairs.</p>
+                <span>Beginner →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('lewis')">
+                <div class="icon">••</div>
+                <h3>Lewis Structures</h3>
+                <p>Build Lewis structures using a simple method.</p>
+                <span>Intermediate →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('vsepr')">
+                <div class="icon">◇</div>
+                <h3>VSEPR Theory</h3>
+                <p>Predict molecular shapes using electron-pair repulsion.</p>
+                <span>Intermediate →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('hybridisation')">
+                <div class="icon">sp³</div>
+                <h3>Hybridisation</h3>
+                <p>Understand sp, sp², sp³ and molecular geometry.</p>
+                <span>Intermediate →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('polarity')">
+                <div class="icon">δ</div>
+                <h3>Polarity</h3>
+                <p>Understand electronegativity, dipoles and molecular polarity.</p>
+                <span>Advanced →</span>
+            </div>
+
+            <div class="guide-card" onclick="openGuide('mot')">
+                <div class="icon">MO</div>
+                <h3>Molecular Orbital Theory</h3>
+                <p>Explore bonding and antibonding molecular orbitals.</p>
+                <span>Advanced →</span>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- CONCEPT VIEWER -->
+
+    <section id="conceptViewer" class="concept-viewer hidden">
+
+        <button class="close-btn" onclick="closeGuide()">×</button>
+
+        <div class="concept-content">
+
+            <p class="tag" id="conceptLevel">CONCEPT</p>
+
+            <h2 id="conceptTitle">Concept</h2>
+
+            <p id="conceptIntro"></p>
+
+            <div class="concept-box">
+                <h3>Core Idea</h3>
+                <p id="conceptIdea"></p>
+            </div>
+
+            <div class="steps">
+                <h3>Learn It Step by Step</h3>
+                <div id="conceptSteps"></div>
+            </div>
+
+            <div class="example-box">
+                <h3>Example</h3>
+                <p id="conceptExample"></p>
+            </div>
+
+            <button class="complete-btn" onclick="completeConcept()">
+                ✓ Mark as Completed
+            </button>
+
+        </div>
+    </section>
+
+
+    <!-- QUIZ -->
+
+    <section class="quiz-section">
+
+        <div class="section-title">
+            <p class="tag">TEST YOUR KNOWLEDGE</p>
+            <h2>Chemical Bonding Quiz</h2>
+            <p>Check how well you understand the concepts.</p>
+        </div>
+
+        <div class="quiz-box">
+
+            <div class="quiz-top">
+                <span id="questionNumber">Question 1 / 10</span>
+                <span id="score">Score: 0</span>
+            </div>
+
+            <div class="quiz-progress">
+                <div id="quizProgress"></div>
+            </div>
+
+            <h3 id="question">
+                Which type of bond is formed by transfer of electrons?
+            </h3>
+
+            <div id="options"></div>
+
+            <button id="nextBtn" onclick="nextQuestion()" disabled>
+                Next Question →
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <h3>ChemBonding</h3>
+    <p>Interactive Chemical Bonding Learning Platform</p>
+</footer>
+
+<script src="guides.js"></script>
+
+</body>
+</html>

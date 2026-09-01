@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Molecular Lab</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+    
+    <div class="logo">
+        <div class="logoIcon">⚛</div>
+        <div>
+            <h1>Molecular Lab</h1>
+            <span>Chemical Bonding Simulator</span>
+        </div>
+    </div>
+
+    <div class="topActions">
+        <button onclick="window.location.href='guides.html'"</button>
+        <button onclick="window.location.href='periodic.html'">Periodic Table</button>
+    </div>
+
+</header>
+
+
+<main>
+
+<section id="moleculePage">
+
+    <aside class="sidebar">
+
+        <div class="searchBox">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search molecule..."
+                oninput="searchMolecules()"
+            >
+        </div>
+
+        <div class="categories">
+
+            <button class="category active" onclick="filterCategory('All',this)">
+                All Molecules
+            </button>
+
+            <button class="category" onclick="filterCategory('Inorganic',this)">
+                Inorganic
+            </button>
+
+            <button class="category" onclick="filterCategory('Organic',this)">
+                Organic
+            </button>
+
+            <button class="category" onclick="filterCategory('Acids',this)">
+                Acids
+            </button>
+
+            <button class="category" onclick="filterCategory('Bases',this)">
+                Bases
+            </button>
+
+            <button class="category" onclick="filterCategory('Gases',this)">
+                Gases
+            </button>
+
+            <button class="category" onclick="filterCategory('Ions',this)">
+                Ions
+            </button>
+
+        </div>
+
+        <div class="moleculeCount">
+            <span id="moleculeCount">0</span> molecules
+        </div>
+
+        <div id="moleculeList" class="moleculeList"></div>
+
+    </aside>
+
+
+    <section class="viewerArea">
+
+        <div id="viewer"></div>
+
+        <div class="viewerControls">
+
+            <button onclick="resetCamera()">Reset</button>
+
+            <button onclick="toggleLabels()">Labels</button>
+
+            <button onclick="toggleBonds()">Bonds</button>
+
+            <button onclick="randomMolecule()">Random</button>
+
+        </div>
+
+
+        <div class="moleculeInfo">
+
+            <h2 id="moleculeName">Select a molecule</h2>
+
+            <div class="formula" id="moleculeFormula">—</div>
+
+            <div class="infoGrid">
+
+                <div>
+                    <span>Shape</span>
+                    <strong id="shape">—</strong>
+                </div>
+
+                <div>
+                    <span>Hybridization</span>
+                    <strong id="hybridization">—</strong>
+                </div>
+
+                <div>
+                    <span>Bond Angle</span>
+                    <strong id="angle">—</strong>
+                </div>
+
+                <div>
+                    <span>Polarity</span>
+                    <strong id="polarity">—</strong>
+                </div>
+
+                <div>
+                    <span>Electron Domains</span>
+                    <strong id="domains">—</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</section>
+<div class="periodic-legend">
+
+    <div class="legend-item">
+        <span class="legend-color legend-alkali"></span>
+        Alkali Metals
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-alkaline"></span>
+        Alkaline Earth
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-transition"></span>
+        Transition Metals
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-post"></span>
+        Post-Transition
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-metalloid"></span>
+        Metalloids
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-nonmetal"></span>
+        Nonmetals
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-noble"></span>
+        Noble Gases
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-lanthanide"></span>
+        Lanthanides
+    </div>
+
+    <div class="legend-item">
+        <span class="legend-color legend-actinide"></span>
+        Actinides
+    </div>
+
+</div>
+
+<section id="periodicPage" class="hidden">
+
+    <div class="periodicHeader">
+
+        <h2>Interactive Periodic Table</h2>
+
+        <p>
+            Select an element to view its atomic properties.
+        </p>
+
+    </div>
+
+    <div id="periodicTable"></div>
+
+    <div id="elementInfo" class="elementInfo">
+
+        <h2>Select an element</h2>
+
+        <div id="elementDetails">
+            Click any element above.
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

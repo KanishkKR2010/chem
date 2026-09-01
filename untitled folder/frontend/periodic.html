@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Periodic Table Explorer</title>
+
+    <link rel="stylesheet" href="periodic.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <button class="back-btn" onclick="goBack()">
+            ←
+        </button>
+
+        <div>
+            <div class="eyebrow">
+                CHEMISTRY LAB
+            </div>
+
+            <h1>
+                Periodic Table Explorer
+            </h1>
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <input
+            id="search"
+            type="search"
+            placeholder="Search element, symbol or atomic number..."
+        >
+
+        <button onclick="resetTable()">
+            Reset
+        </button>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="hero">
+
+        <div>
+
+            <span class="pill">
+                118 ELEMENTS
+            </span>
+
+            <h2>
+                Explore the Periodic Table
+            </h2>
+
+            <p>
+                Explore element classification and important periodic
+                properties including atomic radius, electronegativity,
+                ionization energy, electron affinity and more.
+            </p>
+
+        </div>
+
+
+        <div class="quick-info">
+
+            <div>
+                <b>118</b>
+                <span>Elements</span>
+            </div>
+
+            <div>
+                <b>18</b>
+                <span>Groups</span>
+            </div>
+
+            <div>
+                <b>7</b>
+                <span>Periods</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROPERTY BUTTONS -->
+
+    <nav
+        class="property-tabs"
+        id="propertyTabs">
+    </nav>
+
+
+    <!-- LEGEND -->
+
+    <section class="legend-panel">
+
+        <div>
+
+            <b id="propertyTitle">
+                Element Classification
+            </b>
+
+            <span id="propertyDescription">
+                Chemical classification
+            </span>
+
+        </div>
+
+
+        <div id="legend"></div>
+
+    </section>
+
+
+    <!-- PERIODIC TABLE -->
+
+    <section class="table-wrap">
+
+        <div
+            id="periodicTable"
+            class="periodic-grid">
+        </div>
+
+
+        <div class="series-label">
+            Lanthanides
+        </div>
+
+        <div
+            id="lanthanides"
+            class="series-grid">
+        </div>
+
+
+        <div class="series-label">
+            Actinides
+        </div>
+
+        <div
+            id="actinides"
+            class="series-grid">
+        </div>
+
+    </section>
+
+
+    <!-- ELEMENT INFORMATION -->
+
+    <section
+        class="details"
+        id="elementDetails">
+
+        <div class="details-placeholder">
+
+            <div class="big-symbol">
+                ?
+            </div>
+
+            <h3>
+                Select an element
+            </h3>
+
+            <p>
+                Click any element to view its properties.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="periodic.js"></script>
+
+</body>
+</html>

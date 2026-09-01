@@ -1,0 +1,507 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #050807;
+  color: #eafff3;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+
+/* =========================
+ TOP BAR
+========================= */
+
+.topbar {
+  height: 72px;
+  border-bottom: 1px solid #183b2b;
+  background: #07100c;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 25px;
+
+  position: relative;
+  z-index: 20;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: #0c2419;
+  border: 1px solid #25c77a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #3cff9b;
+  font-size: 25px;
+}
+
+.logo h1 {
+  font-size: 20px;
+}
+
+.logo span {
+  color: #6e9180;
+  font-size: 11px;
+}
+
+.topActions {
+  display: flex;
+  gap: 10px;
+}
+
+.topActions button,
+.viewerControls button {
+  background: #0b1912;
+  color: #dfffee;
+
+  border: 1px solid #214b36;
+
+  padding: 9px 15px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.topActions button:hover,
+.viewerControls button:hover {
+  background: #123322;
+  border-color: #31e88b;
+}
+
+
+/* =========================
+ MAIN
+========================= */
+
+main {
+  height: calc(100vh - 72px);
+}
+
+#moleculePage {
+  height: 100%;
+  display: flex;
+}
+
+
+/* =========================
+ SIDEBAR
+========================= */
+
+.sidebar {
+  width: 310px;
+
+  background: #07100c;
+
+  border-right: 1px solid #183b2b;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.searchBox {
+  padding: 17px;
+}
+
+.searchBox input {
+  width: 100%;
+
+  background: #0a1710;
+
+  color: white;
+
+  border: 1px solid #214b36;
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  outline: none;
+}
+
+.searchBox input:focus {
+  border-color: #31e88b;
+}
+
+.categories {
+  padding: 0 15px 12px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.category {
+  background: #0b1711;
+  color: #9bb8a8;
+
+  border: 1px solid #1c392a;
+
+  border-radius: 7px;
+
+  padding: 7px 10px;
+
+  cursor: pointer;
+
+  font-size: 12px;
+}
+
+.category:hover,
+.category.active {
+  background: #123522;
+  color: #3cff9b;
+
+  border-color: #2ccf7a;
+}
+
+.moleculeCount {
+  padding: 5px 17px;
+
+  color: #6d8d7b;
+
+  font-size: 12px;
+}
+
+.moleculeList {
+  overflow-y: auto;
+
+  padding: 8px 10px;
+
+  flex: 1;
+}
+
+.moleculeItem {
+  padding: 13px;
+
+  margin-bottom: 5px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  border: 1px solid transparent;
+}
+
+.moleculeItem:hover {
+  background: #0c1e14;
+  border-color: #1c4931;
+}
+
+.moleculeItem.selected {
+  background: #10291b;
+  border-color: #2ccf7a;
+}
+
+.moleculeItem strong {
+  display: block;
+
+  color: #eafff3;
+
+  font-size: 14px;
+}
+
+.moleculeItem span {
+  color: #668473;
+
+  font-size: 12px;
+}
+
+
+/* =========================
+ VIEWER
+========================= */
+
+.viewerArea {
+  flex: 1;
+
+  position: relative;
+
+  background:
+      radial-gradient(
+          circle at center,
+          #0d2117 0%,
+          #07100c 45%,
+          #030605 100%
+      );
+}
+
+#viewer {
+  position: absolute;
+
+  inset: 0;
+}
+
+#viewer canvas {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: block;
+}
+
+
+/* =========================
+ CONTROLS
+========================= */
+
+.viewerControls {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  display: flex;
+
+  gap: 7px;
+
+  z-index: 5;
+}
+
+.viewerControls button {
+  backdrop-filter: blur(10px);
+
+  background: rgba(5, 15, 10, 0.85);
+}
+
+
+/* =========================
+ INFO PANEL
+========================= */
+
+.moleculeInfo {
+  position: absolute;
+
+  bottom: 20px;
+  left: 20px;
+
+  width: min(600px, calc(100% - 40px));
+
+  padding: 20px;
+
+  background: rgba(5, 13, 9, 0.91);
+
+  border: 1px solid #214b36;
+
+  border-radius: 14px;
+
+  backdrop-filter: blur(15px);
+
+  z-index: 5;
+}
+
+.moleculeInfo h2 {
+  font-size: 21px;
+}
+
+.formula {
+  color: #36e98d;
+
+  font-size: 22px;
+
+  margin: 5px 0 18px;
+}
+
+.infoGrid {
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 10px;
+}
+
+.infoGrid div {
+  background: #0b1710;
+
+  border: 1px solid #183b2a;
+
+  padding: 10px;
+
+  border-radius: 8px;
+}
+
+.infoGrid span {
+  display: block;
+
+  font-size: 10px;
+
+  color: #668473;
+
+  margin-bottom: 5px;
+}
+
+.infoGrid strong {
+  font-size: 12px;
+
+  color: #d9f7e6;
+}
+
+
+/* =========================
+ PERIODIC TABLE
+========================= */
+
+#periodicPage {
+  height: 100%;
+
+  overflow: auto;
+
+  padding: 35px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.periodicHeader {
+  margin-bottom: 25px;
+}
+
+.periodicHeader h2 {
+  font-size: 28px;
+}
+
+.periodicHeader p {
+  color: #759586;
+
+  margin-top: 5px;
+}
+
+#periodicTable {
+  display: grid;
+
+  grid-template-columns: repeat(18, minmax(45px, 1fr));
+
+  gap: 5px;
+
+  max-width: 1250px;
+
+  margin: auto;
+}
+
+.element {
+  min-height: 62px;
+
+  border: 1px solid #234a35;
+
+  background: #0a1710;
+
+  border-radius: 6px;
+
+  padding: 5px;
+
+  cursor: pointer;
+
+  transition: 0.15s;
+}
+
+.element:hover {
+  transform: translateY(-3px);
+
+  border-color: #39ed91;
+
+  background: #123522;
+}
+
+.element .number {
+  font-size: 9px;
+
+  color: #6f8c7c;
+}
+
+.element .symbol {
+  font-size: 18px;
+
+  font-weight: bold;
+
+  color: #3cff9b;
+}
+
+.element .name {
+  font-size: 8px;
+
+  color: #91aa9d;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+}
+
+.elementInfo {
+  max-width: 1250px;
+
+  margin: 25px auto;
+
+  padding: 20px;
+
+  border: 1px solid #214b36;
+
+  border-radius: 12px;
+
+  background: #08130d;
+}
+
+#elementDetails {
+  color: #93a99d;
+
+  margin-top: 10px;
+}
+
+
+/* =========================
+ SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050a07;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #204d35;
+
+  border-radius: 10px;
+}
+
+
+/* =========================
+ MOBILE
+========================= */
+
+@media(max-width: 800px) {
+
+  .sidebar {
+      width: 230px;
+  }
+
+  .infoGrid {
+      grid-template-columns: repeat(2, 1fr);
+  }
+
+  #periodicTable {
+      grid-template-columns: repeat(9, 55px);
+      justify-content: start;
+  }
+
+}

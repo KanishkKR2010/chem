@@ -1,0 +1,537 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5fff9;
+    color: #10231b;
+}
+
+.topbar {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7%;
+    background: white;
+    border-bottom: 1px solid #dceee4;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #00a86b;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #50645a;
+    font-weight: 600;
+}
+
+nav a:hover,
+nav .active {
+    color: #00a86b;
+}
+
+
+/* HERO */
+
+.hero {
+    min-height: 570px;
+    padding: 80px 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background:
+        radial-gradient(circle at 80% 30%, #d5ffe9, transparent 30%),
+        linear-gradient(135deg, #ffffff, #edfff6);
+}
+
+.tag {
+    color: #00a86b;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.hero h1 {
+    font-size: clamp(45px, 6vw, 76px);
+    line-height: 1.05;
+    margin-bottom: 25px;
+}
+
+.hero h1 span {
+    color: #00a86b;
+}
+
+.hero-text {
+    max-width: 600px;
+    color: #60756b;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+.hero button {
+    margin-top: 30px;
+    border: none;
+    background: #00a86b;
+    color: white;
+    padding: 16px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.hero button:hover {
+    background: #008957;
+}
+
+
+/* ATOM */
+
+.atom {
+    width: 300px;
+    height: 300px;
+    position: relative;
+}
+
+.nucleus {
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    background: #00a86b;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: bold;
+    left: 108px;
+    top: 108px;
+    box-shadow: 0 0 40px #8ce8bd;
+}
+
+.orbit {
+    position: absolute;
+    border: 2px solid #83d9b2;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.orbit1 {
+    width: 170px;
+    height: 170px;
+}
+
+.orbit2 {
+    width: 270px;
+    height: 270px;
+}
+
+.electron {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #00a86b;
+}
+
+.e1 {
+    top: 65px;
+    left: 142px;
+}
+
+.e2 {
+    bottom: 65px;
+    left: 142px;
+}
+
+.e3 {
+    top: 142px;
+    left: 65px;
+}
+
+.e4 {
+    top: 142px;
+    right: 65px;
+}
+
+
+/* PROGRESS */
+
+.progress-section {
+    margin: 50px auto;
+    width: 80%;
+    padding: 25px 30px;
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #dceee4;
+}
+
+.progress-section h2 {
+    margin-bottom: 7px;
+}
+
+.progress-section p {
+    color: #708078;
+}
+
+.progress {
+    margin-top: 18px;
+    height: 10px;
+    background: #e4f1eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    background: #00a86b;
+    transition: .5s;
+}
+
+
+/* SECTION */
+
+.guides-section,
+.quiz-section {
+    width: 80%;
+    margin: 90px auto;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.section-title h2 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.section-title p:last-child {
+    color: #708078;
+}
+
+
+/* CARDS */
+
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.guide-card {
+    background: white;
+    border: 1px solid #dceee4;
+    padding: 28px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.guide-card:hover {
+    transform: translateY(-7px);
+    border-color: #00a86b;
+    box-shadow: 0 15px 35px rgba(0, 168, 107, .12);
+}
+
+.icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 14px;
+    background: #e4fff2;
+    color: #00a86b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 22px;
+    margin-bottom: 22px;
+}
+
+.guide-card h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.guide-card p {
+    color: #718078;
+    line-height: 1.6;
+    min-height: 75px;
+}
+
+.guide-card span {
+    display: block;
+    margin-top: 20px;
+    color: #00a86b;
+    font-weight: bold;
+}
+
+
+/* CONCEPT */
+
+.concept-viewer {
+    width: 80%;
+    margin: 50px auto;
+    background: white;
+    border: 1px solid #dceee4;
+    border-radius: 25px;
+    padding: 50px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 100, 70, .08);
+}
+
+.hidden {
+    display: none;
+}
+
+.close-btn {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    border: none;
+    background: #eef8f3;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.concept-content {
+    max-width: 900px;
+    margin: auto;
+}
+
+.concept-content h2 {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.concept-content > p:not(.tag) {
+    color: #687970;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.concept-box,
+.example-box {
+    margin-top: 30px;
+    padding: 25px;
+    background: #effff7;
+    border-left: 5px solid #00a86b;
+    border-radius: 12px;
+}
+
+.concept-box p,
+.example-box p {
+    margin-top: 10px;
+    color: #53675e;
+    line-height: 1.7;
+}
+
+.steps {
+    margin-top: 35px;
+}
+
+.steps h3 {
+    margin-bottom: 20px;
+}
+
+.step {
+    display: flex;
+    gap: 18px;
+    padding: 18px;
+    border-bottom: 1px solid #e5eee9;
+}
+
+.step-number {
+    min-width: 38px;
+    height: 38px;
+    background: #00a86b;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.step p {
+    color: #596b63;
+    line-height: 1.6;
+}
+
+.complete-btn {
+    margin-top: 30px;
+    padding: 14px 25px;
+    border: none;
+    background: #00a86b;
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+/* QUIZ */
+
+.quiz-box {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    border: 1px solid #dceee4;
+    border-radius: 22px;
+    padding: 35px;
+}
+
+.quiz-top {
+    display: flex;
+    justify-content: space-between;
+    color: #65776e;
+    font-weight: bold;
+}
+
+.quiz-progress {
+    height: 7px;
+    background: #e4f1eb;
+    border-radius: 10px;
+    margin: 20px 0 35px;
+}
+
+#quizProgress {
+    height: 100%;
+    width: 10%;
+    background: #00a86b;
+    border-radius: 10px;
+}
+
+#question {
+    font-size: 24px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.option {
+    padding: 17px;
+    margin: 12px 0;
+    border: 2px solid #e1ece7;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.option:hover {
+    border-color: #00a86b;
+    background: #f2fff8;
+}
+
+.option.selected {
+    border-color: #00a86b;
+    background: #e5fff2;
+}
+
+.option.correct {
+    border-color: #20a65a;
+    background: #e4f9e9;
+}
+
+.option.wrong {
+    border-color: #e55d5d;
+    background: #fff0f0;
+}
+
+#nextBtn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #00a86b;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#nextBtn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+
+/* FOOTER */
+
+footer {
+    margin-top: 100px;
+    padding: 50px;
+    text-align: center;
+    background: #10231b;
+    color: white;
+}
+
+footer p {
+    margin-top: 8px;
+    color: #b5c8bf;
+}
+
+
+/* RESPONSIVE */
+
+@media(max-width:1000px) {
+    .guide-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .atom {
+        display: none;
+    }
+}
+
+@media(max-width:650px) {
+
+    nav {
+        display: none;
+    }
+
+    .hero {
+        padding: 60px 8%;
+    }
+
+    .guides-section,
+    .quiz-section,
+    .progress-section,
+    .concept-viewer {
+        width: 90%;
+    }
+
+    .guide-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .concept-viewer {
+        padding: 30px 20px;
+    }
+}
