@@ -1,39 +1,380 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Molecular Lab</title>
+```
+<title>ChemBonding Live Quiz</title>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    body {
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+
+        background:
+            radial-gradient(
+                circle at 20% 20%,
+                rgba(0, 255, 140, 0.15),
+                transparent 35%
+            ),
+            radial-gradient(
+                circle at 80% 80%,
+                rgba(0, 180, 255, 0.12),
+                transparent 35%
+            ),
+            #050b08;
+
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+    }
+
+    /* Background particles */
+
+    .particle {
+        position: fixed;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #55ff9a;
+        opacity: 0.5;
+        animation: float 7s infinite ease-in-out;
+    }
+
+    .p1 {
+        top: 15%;
+        left: 12%;
+    }
+
+    .p2 {
+        top: 70%;
+        left: 20%;
+        animation-delay: 2s;
+    }
+
+    .p3 {
+        top: 25%;
+        right: 15%;
+        animation-delay: 1s;
+    }
+
+    .p4 {
+        bottom: 15%;
+        right: 20%;
+        animation-delay: 3s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-30px);
+        }
+    }
+
+    .wrapper {
+        width: 92%;
+        max-width: 900px;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .badge {
+        display: inline-block;
+
+        padding: 8px 16px;
+
+        border: 1px solid rgba(85, 255, 154, 0.4);
+        border-radius: 50px;
+
+        color: #55ff9a;
+        background: rgba(85, 255, 154, 0.08);
+
+        font-size: 13px;
+        font-weight: bold;
+
+        letter-spacing: 1.5px;
+
+        margin-bottom: 25px;
+    }
+
+    h1 {
+        font-size: clamp(48px, 9vw, 90px);
+        line-height: 0.95;
+
+        font-weight: 900;
+
+        letter-spacing: -4px;
+
+        margin-bottom: 20px;
+    }
+
+    h1 span {
+        color: #55ff9a;
+    }
+
+    .subtitle {
+        max-width: 600px;
+        margin: auto;
+
+        color: #a9bdb3;
+
+        font-size: 18px;
+        line-height: 1.6;
+
+        margin-bottom: 42px;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+
+        flex-wrap: wrap;
+    }
+
+    button {
+        min-width: 210px;
+
+        padding: 18px 28px;
+
+        border-radius: 14px;
+        border: none;
+
+        font-size: 16px;
+        font-weight: 900;
+
+        cursor: pointer;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .host-btn {
+        background: #55ff9a;
+        color: #04150b;
+
+        box-shadow:
+            0 0 25px rgba(85, 255, 154, 0.2);
+    }
+
+    .host-btn:hover {
+        transform: translateY(-4px);
+
+        box-shadow:
+            0 12px 35px rgba(85, 255, 154, 0.3);
+    }
+
+    .join-btn {
+        background: rgba(255, 255, 255, 0.04);
+
+        color: white;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .join-btn:hover {
+        transform: translateY(-4px);
+
+        background: rgba(255, 255, 255, 0.08);
+
+        border-color: #55ff9a;
+    }
+
+    .features {
+        margin-top: 60px;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 15px;
+    }
+
+    .feature {
+        padding: 20px;
+
+        border-radius: 16px;
+
+        background: rgba(255, 255, 255, 0.035);
+
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.08);
+    }
+
+    .feature-icon {
+        font-size: 25px;
+        margin-bottom: 10px;
+    }
+
+    .feature h3 {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .feature p {
+        font-size: 12px;
+        color: #879b91;
+    }
+
+    .footer {
+        margin-top: 35px;
+
+        font-size: 12px;
+
+        color: #61736a;
+    }
+
+    @media (max-width: 650px) {
+
+        h1 {
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+        }
+
+        .buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .features {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+```
+
 </head>
 
 <body>
 
-<header class="topbar">
-    
-    <div class="logo">
-        <div class="logoIcon">⚛</div>
-        <div>
-            <h1>Molecular Lab</h1>
-            <span>Chemical Bonding Simulator</span>
+```
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+
+<main class="wrapper">
+
+    <div class="badge">
+        LIVE CHEMISTRY QUIZ
+    </div>
+
+    <h1>
+        Chem<span>Bonding</span>
+    </h1>
+
+    <p class="subtitle">
+        Learn chemical bonding, challenge your classmates,
+        answer questions in real time and climb the leaderboard.
+    </p>
+
+    <div class="buttons">
+
+        <button
+            class="host-btn"
+            onclick="window.location.href='host.html'"
+        >
+            HOST A QUIZ
+        </button>
+
+        <button
+            class="join-btn"
+            onclick="window.location.href='student.html'"
+        >
+            JOIN QUIZ
+        </button>
+
+    </div>
+
+    <section class="features">
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                ⚡
+            </div>
+
+            <h3>
+                Live Gameplay
+            </h3>
+
+            <p>
+                Questions and answers update in real time.
+            </p>
+
         </div>
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🧪
+            </div>
+
+            <h3>
+                Chemistry
+            </h3>
+
+            <p>
+                Practice chemical bonding concepts interactively.
+            </p>
+
+        </div>
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🏆
+            </div>
+
+            <h3>
+                Leaderboard
+            </h3>
+
+            <p>
+                Compete with your classmates and track scores.
+            </p>
+
+        </div>
+
+    </section>
+
+    <div class="footer">
+        ChemBonding Quiz Platform
     </div>
 
-    <div class="topActions">
-        <button onclick="window.location.href='guides.html'"</button>
-        <button onclick="window.location.href='periodic.html'">Periodic Table</button>
-    </div>
+</main>
+```
 
-</header>
-
-
-<main>
-
-<section id="moleculePage">
+</body>
+</html>
 
     <aside class="sidebar">
 
