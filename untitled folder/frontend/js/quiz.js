@@ -1,171 +1,268 @@
-const socket =
-    io(https://chem-1-b9sa.onrender.com);
+// ============================================
+// ChemBonding - Quiz Engine
+// ============================================
+
+console.log("quiz.js loaded");
+
+
+const socket = io(API_URL, {
+    transports: ["websocket", "polling"]
+});
+
 
 const params =
     new URLSearchParams(
-        location.search
+        window.location.search
     );
 
-const code =
+
+const gameCode =
     params.get("code");
 
 const isHost =
     params.get("host") === "true";
 
 
-const question =
-    document.getElementById(
-        "question"
-    );
+const questionElement =
+    document.getElementById("question");
 
-const questionNumber =
+const questionNumberElement =
     document.getElementById(
         "questionNumber"
     );
 
-const timer =
-    document.getElementById(
-        "timer"
-    );
+const timerElement =
+    document.getElementById("timer");
 
-const answers =
-    document.getElementById(
-        "answers"
-    );
+const answersElement =
+    document.getElementById("answers");
 
-const result =
-    document.getElementById(
-        "result"
-    );
+const resultElement =
+    document.getElementById("result");
 
 const progressBar =
-    document.getElementById(
-        "progressBar"
-    );
+    document.getElementById("progressBar");
 
-const leaderboard =
+const leaderboardElement =
     document.getElementById(
         "leaderboard"
     );
 
-const leaderboardList =
+const leaderboardListElement =
     document.getElementById(
         "leaderboardList"
     );
 
-const nextBtn =
-    document.getElementById(
-        "nextBtn"
-    );
+const nextButton =
+    document.getElementById("nextBtn");
 
 
 let currentQuestion = null;
+
 let timerInterval = null;
 
+let answered = false;
 
-/*
-Reconnect.
-*/
 
-if (isHost) {
+// ============================================
+// Validate
+// ============================================
 
-    socket.emit(
-        "host-reconnect",
-        {
-            code,
+if (!gameCode) {
 
-            hostToken:
-                localStorage.getItem(
-                    "hostToken"
-                )
-        }
-    );
-
-} else {
-
-    socket.emit(
-        "join-game",
-        {
-            code,
-
-            name:
-                sessionStorage.getItem(
-                    "playerName"
-                )
-        }
-    );
-
+    window.location.href =
+        "index.html";
 }
 
 
-/*
-QUESTION
-*/
+// ============================================
+// CONNECT
+// ============================================
+
+socket.on("connect", () => {
+
+    console.log(
+        "Quiz connected:",
+        socket.id
+    );
+
+    reconnectQuiz();
+
+});
+
 
 socket.on(
-    "question",
-    data => {
+    "connect_error",
+    (error) => {
 
-        currentQuestion =
-            data;
-
-        leaderboard.classList.add(
-            "hidden"
+        console.error(
+            "Quiz connection error:",
+            error
         );
-
-        result.textContent = "";
-
-        question.textContent =
-            data.question;
-
-        questionNumber.textContent =
-            `${data.index + 1}/${data.total}`;
-
-        answers.innerHTML = "";
-
-        data.options.forEach(
-            (option, index) => {
-
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.className =
-                    "answer";
-
-                button.textContent =
-                    option;
-
-                button.onclick = () => {
-
-                    submitAnswer(index);
-
-                };
-
-                answers.appendChild(
-                    button
-                );
-
-            }
-        );
-
-        startTimer(data);
 
     }
 );
 
 
-/*
-ANSWER
-*/
+// ============================================
+// RECONNECT
+// ============================================
+
+function reconnectQuiz() {
+
+    if (isHost) {
+
+        const hostToken =
+            localStorage.getItem(
+                "hostToken"
+            );
+
+        socket.emit(
+            "host-reconnect",
+            {
+                code: gameCode,
+                hostToken: hostToken
+            }
+        );
+
+    } else {
+
+        const playerName =
+            sessionStorage.getItem(
+                "playerName"
+            );
+
+        socket.emit(
+            "join-game",
+            {
+                code: gameCode,
+                name: playerName
+            }
+        );
+
+    }
+}
+
+
+// ============================================
+// QUESTION
+// ============================================
+
+socket.on(
+    "question",
+    (data) => {
+
+        console.log(
+            "New question:",
+            data
+        );
+
+        currentQuestion =
+            data;
+
+        answered = false;
+
+        displayQuestion(data);
+
+    }
+);
+
+
+function displayQuestion(data) {
+
+    clearInterval(
+        timerInterval
+    );
+
+
+    leaderboardElement.classList.add(
+        "hidden"
+    );
+
+
+    resultElement.textContent =
+        "";
+
+
+    questionElement.textContent =
+        data.question;
+
+
+    questionNumberElement.textContent =
+        `${data.index + 1}/${data.total}`;
+
+
+    answersElement.innerHTML =
+        "";
+
+
+    const answerLetters =
+        ["A", "B", "C", "D"];
+
+
+    data.options.forEach(
+        (option, index) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+
+            button.innerHTML =
+                `<strong>
+                    ${answerLetters[index]}
+                </strong>
+                <span>
+                    ${escapeHTML(option)}
+                </span>`;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    submitAnswer(
+                        index
+                    );
+
+                }
+            );
+
+
+            answersElement.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    startTimer(data);
+
+}
+
+
+// ============================================
+// SUBMIT ANSWER
+// ============================================
 
 function submitAnswer(index) {
+
+    if (answered)
+        return;
+
+    answered = true;
+
 
     const buttons =
         document.querySelectorAll(
             ".answer"
         );
+
 
     buttons.forEach(
         button => {
@@ -176,6 +273,7 @@ function submitAnswer(index) {
         }
     );
 
+
     socket.emit(
         "submit-answer",
         {
@@ -183,22 +281,30 @@ function submitAnswer(index) {
         }
     );
 
+
+    resultElement.textContent =
+        "Answer submitted";
+
 }
 
 
+// ============================================
+// ANSWER RESULT
+// ============================================
+
 socket.on(
     "answer-result",
-    data => {
+    (data) => {
 
         if (data.correct) {
 
-            result.textContent =
+            resultElement.textContent =
                 `Correct! +${data.points} points`;
 
         } else {
 
-            result.textContent =
-                "Incorrect";
+            resultElement.textContent =
+                "Incorrect answer";
 
         }
 
@@ -206,9 +312,32 @@ socket.on(
 );
 
 
-/*
-TIMER
-*/
+// ============================================
+// ANSWER LOCKED
+// ============================================
+
+socket.on(
+    "answer-locked",
+    () => {
+
+        document
+            .querySelectorAll(
+                ".answer"
+            )
+            .forEach(
+                button => {
+                    button.disabled =
+                        true;
+                }
+            );
+
+    }
+);
+
+
+// ============================================
+// TIMER
+// ============================================
 
 function startTimer(data) {
 
@@ -216,31 +345,52 @@ function startTimer(data) {
         timerInterval
     );
 
-    const end =
-        data.startedAt +
+
+    const duration =
         data.duration * 1000;
 
-    function update() {
+
+    const start =
+        data.startedAt;
+
+
+    const end =
+        start + duration;
+
+
+    function updateTimer() {
+
+        const now =
+            Date.now();
+
 
         const remaining =
             Math.max(
                 0,
-                end - Date.now()
+                end - now
             );
+
 
         const seconds =
             Math.ceil(
                 remaining / 1000
             );
 
-        timer.textContent =
+
+        timerElement.textContent =
             seconds;
 
-        progressBar.style.width =
-            `${(
+
+        const percentage =
+            (
                 remaining /
-                (data.duration * 1000)
-            ) * 100}%`;
+                duration
+            ) * 100;
+
+
+        progressBar.style.width =
+            `${percentage}%`;
+
 
         if (seconds <= 0) {
 
@@ -248,40 +398,59 @@ function startTimer(data) {
                 timerInterval
             );
 
+
             document
                 .querySelectorAll(
                     ".answer"
                 )
                 .forEach(
-                    b =>
-                        b.disabled = true
+                    button => {
+                        button.disabled =
+                            true;
+                    }
                 );
 
         }
 
     }
 
-    update();
+
+    updateTimer();
+
 
     timerInterval =
         setInterval(
-            update,
+            updateTimer,
             100
         );
+
 }
 
 
-/*
-QUESTION ENDED
-*/
+// ============================================
+// QUESTION ENDED
+// ============================================
 
 socket.on(
     "question-ended",
-    data => {
+    (data) => {
 
         clearInterval(
             timerInterval
         );
+
+
+        document
+            .querySelectorAll(
+                ".answer"
+            )
+            .forEach(
+                button => {
+                    button.disabled =
+                        true;
+                }
+            );
+
 
         showLeaderboard(
             data.leaderboard
@@ -291,15 +460,34 @@ socket.on(
 );
 
 
-function showLeaderboard(list) {
+// ============================================
+// LEADERBOARD
+// ============================================
 
-    leaderboard.classList.remove(
+function showLeaderboard(players) {
+
+    leaderboardElement.classList.remove(
         "hidden"
     );
 
-    leaderboardList.innerHTML = "";
 
-    list.forEach(
+    leaderboardListElement.innerHTML =
+        "";
+
+
+    if (
+        !players ||
+        players.length === 0
+    ) {
+
+        leaderboardListElement.innerHTML =
+            "<p>No players.</p>";
+
+        return;
+    }
+
+
+    players.forEach(
         (player, index) => {
 
             const row =
@@ -310,34 +498,54 @@ function showLeaderboard(list) {
             row.className =
                 "rank";
 
+
+            let medal = "";
+
+
+            if (index === 0)
+                medal = "🥇";
+
+            if (index === 1)
+                medal = "🥈";
+
+            if (index === 2)
+                medal = "🥉";
+
+
             row.innerHTML =
                 `<span>
+                    ${medal}
                     #${index + 1}
                     ${escapeHTML(player.name)}
-                 </span>
-                 <strong>
-                    ${player.score}
-                 </strong>`;
+                </span>
 
-            leaderboardList.appendChild(
+                <strong>
+                    ${player.score}
+                </strong>`;
+
+
+            leaderboardListElement.appendChild(
                 row
             );
 
         }
     );
 
-    /*
-    Only teacher gets NEXT.
-    */
 
     if (isHost) {
 
-        nextBtn.style.display =
+        nextButton.style.display =
             "block";
+
+        nextButton.disabled =
+            false;
+
+        nextButton.textContent =
+            "NEXT QUESTION";
 
     } else {
 
-        nextBtn.style.display =
+        nextButton.style.display =
             "none";
 
     }
@@ -345,22 +553,46 @@ function showLeaderboard(list) {
 }
 
 
-nextBtn.onclick = () => {
+// ============================================
+// NEXT QUESTION
+// ============================================
 
-    socket.emit(
-        "next-question"
-    );
+nextButton.addEventListener(
+    "click",
+    () => {
 
-};
+        if (!isHost)
+            return;
 
 
-/*
-FINAL RESULTS
-*/
+        nextButton.disabled =
+            true;
+
+
+        nextButton.textContent =
+            "LOADING...";
+
+
+        socket.emit(
+            "next-question"
+        );
+
+    }
+);
+
+
+// ============================================
+// FINAL GAME
+// ============================================
 
 socket.on(
     "game-finished",
-    data => {
+    (data) => {
+
+        clearInterval(
+            timerInterval
+        );
+
 
         sessionStorage.setItem(
             "finalLeaderboard",
@@ -369,20 +601,63 @@ socket.on(
             )
         );
 
+
         window.location.href =
-            `results.html?code=${code}`;
+            `results.html?code=${gameCode}`;
 
     }
 );
 
 
+// ============================================
+// GAME CLOSED
+// ============================================
+
+socket.on(
+    "game-closed",
+    () => {
+
+        alert(
+            "The teacher ended the quiz."
+        );
+
+        window.location.href =
+            "index.html";
+
+    }
+);
+
+
+// ============================================
+// HTML SECURITY
+// ============================================
+
 function escapeHTML(text) {
 
     return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
 
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
