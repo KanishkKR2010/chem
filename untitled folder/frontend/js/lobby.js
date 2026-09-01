@@ -4,19 +4,37 @@
 
 console.log("lobby.js loaded");
 
+
+// ============================================
+// SOCKET
+// ============================================
+
 const socket = io(API_URL, {
     transports: ["websocket", "polling"]
 });
 
+
+// ============================================
+// URL
+// ============================================
+
 const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const gameCode =
-    params.get("code");
+    (params.get("code") || "")
+        .trim()
+        .toUpperCase();
 
 const isHost =
     params.get("host") === "true";
 
+
+// ============================================
+// ELEMENTS
+// ============================================
 
 const codeElement =
     document.getElementById("code");
@@ -34,11 +52,16 @@ const startBtn =
     document.getElementById("startBtn");
 
 
+// ============================================
+// STATE
+// ============================================
+
 let reconnecting = false;
+let gameStarted = false;
 
 
 // ============================================
-// Basic validation
+// VALIDATION
 // ============================================
 
 if (!gameCode) {
@@ -51,7 +74,7 @@ if (!gameCode) {
 
 
 // ============================================
-// Display code
+// DISPLAY CODE
 // ============================================
 
 codeElement.textContent =
@@ -59,7 +82,17 @@ codeElement.textContent =
 
 
 // ============================================
-// Connection
+// SAVE CODE
+// ============================================
+
+sessionStorage.setItem(
+    "quizCode",
+    gameCode
+);
+
+
+// ============================================
+// CONNECTION
 // ============================================
 
 socket.on("connect", () => {
@@ -74,18 +107,21 @@ socket.on("connect", () => {
 });
 
 
-socket.on("connect_error", (error) => {
+socket.on(
+    "connect_error",
+    (error) => {
 
-    console.error(
-        "Lobby connection error:",
-        error
-    );
+        console.error(
+            "Lobby connection error:",
+            error
+        );
 
-});
+    }
+);
 
 
 // ============================================
-// Reconnect
+// RECONNECT
 // ============================================
 
 function reconnectToGame() {
@@ -96,12 +132,17 @@ function reconnectToGame() {
     reconnecting = true;
 
 
+    // ------------------------------
+    // HOST
+    // ------------------------------
+
     if (isHost) {
 
         const hostToken =
             localStorage.getItem(
                 "hostToken"
             );
+
 
         if (!hostToken) {
 
@@ -115,6 +156,12 @@ function reconnectToGame() {
             return;
         }
 
+
+        console.log(
+            "Reconnecting host..."
+        );
+
+
         socket.emit(
             "host-reconnect",
             {
@@ -123,38 +170,53 @@ function reconnectToGame() {
             }
         );
 
-    } else {
 
-        const playerName =
-            sessionStorage.getItem(
-                "playerName"
-            );
-
-        if (!playerName) {
-
-            alert(
-                "Student session not found."
-            );
-
-            window.location.href =
-                "student.html";
-
-            return;
-        }
-
-        socket.emit(
-            "join-game",
-            {
-                code: gameCode,
-                name: playerName
-            }
-        );
+        return;
     }
+
+
+    // ------------------------------
+    // STUDENT
+    // ------------------------------
+
+    const playerName =
+        sessionStorage.getItem(
+            "playerName"
+        );
+
+
+    if (!playerName) {
+
+        alert(
+            "Student session not found."
+        );
+
+        window.location.href =
+            "student.html";
+
+        return;
+    }
+
+
+    console.log(
+        "Rejoining as:",
+        playerName
+    );
+
+
+    socket.emit(
+        "join-game",
+        {
+            code: gameCode,
+            name: playerName
+        }
+    );
+
 }
 
 
 // ============================================
-// Host successfully reconnects
+// HOST RECONNECTED
 // ============================================
 
 socket.on(
@@ -166,21 +228,26 @@ socket.on(
             data
         );
 
+
         titleElement.textContent =
-            data.title;
+            data.title ||
+            "ChemBonding Quiz";
+
 
         if (isHost) {
 
             startBtn.classList.remove(
                 "hidden"
             );
+
         }
+
     }
 );
 
 
 // ============================================
-// Student joins/rejoins
+// STUDENT JOINED
 // ============================================
 
 socket.on(
@@ -188,34 +255,44 @@ socket.on(
     (data) => {
 
         console.log(
-            "Student joined:",
+            "Joined game:",
             data
         );
 
+
         titleElement.textContent =
-            data.title;
+            data.title ||
+            "ChemBonding Quiz";
+
 
         sessionStorage.setItem(
             "playerName",
             data.name
         );
 
+
         sessionStorage.setItem(
             "quizCode",
             data.code
         );
 
+
+        // Only host sees START
+
         if (isHost) {
+
             startBtn.classList.remove(
                 "hidden"
             );
+
         }
+
     }
 );
 
 
 // ============================================
-// Player list
+// PLAYERS UPDATED
 // ============================================
 
 socket.on(
@@ -227,10 +304,17 @@ socket.on(
             players
         );
 
+
+        if (!Array.isArray(players))
+            return;
+
+
         countElement.textContent =
             players.length;
 
-        playersElement.innerHTML = "";
+
+        playersElement.innerHTML =
+            "";
 
 
         if (players.length === 0) {
@@ -252,15 +336,19 @@ socket.on(
                         "div"
                     );
 
+
                 playerDiv.className =
                     "player";
+
 
                 playerDiv.textContent =
                     `${index + 1}. ${player.name}`;
 
+
                 playersElement.appendChild(
                     playerDiv
                 );
+
             }
         );
 
@@ -279,57 +367,150 @@ startBtn.addEventListener(
         if (!isHost)
             return;
 
-        startBtn.disabled = true;
+
+        if (gameStarted)
+            return;
+
+
+        gameStarted = true;
+
+
+        startBtn.disabled =
+            true;
+
 
         startBtn.textContent =
             "STARTING...";
 
+
+        console.log(
+            "Starting game:",
+            gameCode
+        );
+
+
         socket.emit(
             "start-game"
         );
+
     }
 );
 
 
 // ============================================
-// First question
+// QUESTION STARTED
 // ============================================
 
 socket.on(
     "question",
-    () => {
+    (data) => {
+
+        console.log(
+            "Question started:",
+            data
+        );
+
+
+        if (gameStarted === false) {
+
+            gameStarted = true;
+
+        }
+
 
         window.location.href =
-            `quiz.html?code=${gameCode}` +
-            (isHost
-                ? "&host=true"
-                : "");
+            `quiz.html?code=${encodeURIComponent(gameCode)}` +
+            (
+                isHost
+                    ? "&host=true"
+                    : ""
+            );
 
     }
 );
 
 
 // ============================================
-// Host error
+// GAME STARTED
+// ============================================
+
+socket.on(
+    "game-started",
+    (data) => {
+
+        console.log(
+            "Game started:",
+            data
+        );
+
+    }
+);
+
+
+// ============================================
+// HOST ERROR
 // ============================================
 
 socket.on(
     "host-error",
     (message) => {
 
-        alert(message);
+        console.error(
+            "Host error:",
+            message
+        );
+
+
+        alert(
+            message ||
+            "Unable to start the quiz."
+        );
+
+
+        gameStarted =
+            false;
+
 
         startBtn.disabled =
             false;
 
+
         startBtn.textContent =
             "START QUIZ";
+
     }
 );
 
 
 // ============================================
-// Game closed
+// JOIN ERROR
+// ============================================
+
+socket.on(
+    "join-error",
+    (message) => {
+
+        console.error(
+            "Join error:",
+            message
+        );
+
+
+        alert(
+            message ||
+            "Unable to join the game."
+        );
+
+
+        window.location.href =
+            "student.html";
+
+    }
+);
+
+
+// ============================================
+// GAME CLOSED
 // ============================================
 
 socket.on(
@@ -340,6 +521,7 @@ socket.on(
             "The quiz has been closed."
         );
 
+
         window.location.href =
             "index.html";
 
@@ -348,7 +530,7 @@ socket.on(
 
 
 // ============================================
-// Disconnect
+// DISCONNECT
 // ============================================
 
 socket.on(
